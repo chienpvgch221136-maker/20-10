@@ -27,6 +27,7 @@ interface Flower {
 
 function App() {
   const [isRevealed, setIsRevealed] = useState(false);
+  const [textAnimation, setTextAnimation] = useState(0);
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [sparkles, setSparkles] = useState<Array<{ id: number; x: number; y: number }>>([]);
   const [particles, setParticles] = useState<Particle[]>([]);
@@ -151,6 +152,7 @@ function App() {
 
       setTimeout(() => {
         setIsRevealed(true);
+        setTextAnimation(1);
       }, 300);
     }
   };
@@ -177,8 +179,19 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  useEffect(() => {
+    if (isRevealed) {
+      const timer = setTimeout(() => {
+        setTextAnimation(2);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isRevealed]);
+
+  const message = "Gửi đến những người bà, người mẹ, người chị, người em và những người phụ nữ tuyệt vời. Cảm ơn vì đã khiến thế giới này trở nên rực rỡ như những đóa hoa. Chúc bạn một ngày 20/10 luôn xinh đẹp, hạnh phúc và đong đầy yêu thương!";
+
   return (
-    <div className="relative w-full min-h-screen overflow-hidden bg-gradient-to-br from-pink-50 via-cream to-lavender">
+    <div className="relative w-full min-h-screen overflow-hidden bg-gradient-to-br from-warm-peach via-soft-cream to-blush-pink">
       <canvas
         ref={canvasRef}
         className="fixed top-0 left-0 w-full h-full pointer-events-none z-50"
@@ -186,7 +199,7 @@ function App() {
 
       {!isRevealed && (
         <div
-          className="fixed inset-0 bg-slate-800 bg-opacity-80 flex items-center justify-center z-40 cursor-none transition-opacity duration-1000"
+          className="fixed inset-0 bg-gradient-to-br from-rose-900 via-amber-900 to-rose-950 bg-opacity-90 flex items-center justify-center z-40 cursor-none transition-opacity duration-1000"
           style={{ opacity: isRevealed ? 0 : 1 }}
           onMouseMove={handleMouseMove}
           onClick={handleClick}
@@ -203,7 +216,7 @@ function App() {
             />
           ))}
 
-          <h2 className="text-4xl md:text-5xl text-pink-100 font-elegant text-center px-8 animate-pulse">
+          <h2 className="text-4xl md:text-5xl text-amber-100 font-elegant text-center px-8 animate-pulse">
             Điều diệu kỳ nào đang chờ bạn khám phá?
           </h2>
         </div>
@@ -228,15 +241,25 @@ function App() {
 
         <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
           <div className="text-center mb-12 md:mb-16">
-            <h1 className="title-main text-5xl md:text-7xl font-bold text-brown-dark mb-6 md:mb-8 hover:text-gold transition-all duration-300 hover-underline">
+            <h1 className="title-main text-5xl md:text-7xl font-bold text-rose-800 mb-6 md:mb-8 hover:text-amber-600 transition-all duration-300 hover-underline animate-title">
               Mừng ngày Phụ nữ Việt Nam 20-10
             </h1>
 
             <div className="max-w-3xl mx-auto">
-              <p className="message-text text-xl md:text-2xl text-gray-700 leading-relaxed hover:text-gold transition-colors duration-300 px-4">
-                Gửi đến những người bà, người mẹ, người chị, người em và những người phụ nữ tuyệt vời.
-                Cảm ơn vì đã khiến thế giới này trở nên rực rỡ như những đóa hoa.
-                Chúc bạn một ngày 20/10 luôn xinh đẹp, hạnh phúc và đong đầy yêu thương!
+              <p className="message-text text-xl md:text-2xl text-gray-800 leading-relaxed px-4">
+                {textAnimation > 0 && message.split('').map((char, index) => (
+                  <span
+                    key={index}
+                    className="inline-block animate-char"
+                    style={{
+                      animationDelay: `${index * 0.03}s`,
+                      opacity: 0,
+                      animationFillMode: 'forwards'
+                    }}
+                  >
+                    {char}
+                  </span>
+                ))}
               </p>
             </div>
           </div>
